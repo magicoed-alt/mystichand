@@ -219,7 +219,7 @@ function layout(){
   const bottomStage=(vh-offY)/scale;
   outY=bottomStage+520;
   if(state==='rest')setY(Y_REST); else if(state==='holding')setY(Y_HOLD); else if(state==='locked')setY(Y_REST);
-  $('hot').style.cssText='left:0;top:0;width:'+(PHONE?70:96)+'px;height:'+(PHONE?70:96)+'px';
+  $('hot').style.cssText=PHONE?'left:0;top:64px;width:120px;height:130px':'left:0;top:0;width:96px;height:96px';
 }
 const PH_REST=340,PH_HOLD=215;
 let curY=Y_REST;
@@ -289,7 +289,7 @@ function onSceneTap(e){
   if(state==='locked')return;
   const L=loc(e),x=L.x,w=L.w;
   if(x<w*0.18||x>w*0.82)return;          // só reage no "corredor" central
-  if(L.x<110&&L.y<110)return;
+  if(L.x<125&&L.y<200)return;
   if(state==='rest')sendHand(); else if(state==='holding')returnHand();
 }
 
@@ -355,7 +355,7 @@ function setupScene(){
   // canto superior esquerdo: segurar ~1,6 s volta para a lockscreen (para definir outra carta)
   let timer=null;
   const hot=$('hot');
-  hot.addEventListener('pointerdown',e=>{e.stopPropagation();timer=setTimeout(relock,1600);});
+  hot.addEventListener('pointerdown',e=>{e.stopPropagation();timer=setTimeout(relock,1400);});
   const cancel=()=>{clearTimeout(timer);timer=null;};
   hot.addEventListener('pointerup',cancel);hot.addEventListener('pointerleave',cancel);hot.addEventListener('pointercancel',cancel);
 }
