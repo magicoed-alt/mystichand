@@ -161,7 +161,7 @@ function layout(){
   const vw=innerWidth;let vh=innerHeight;
   const sa=(navigator.standalone===true)||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;
   if(sa){const L=Math.max(screen.width,screen.height),S=Math.min(screen.width,screen.height);vh=Math.max(vh,innerHeight>innerWidth?L:S);}
-  document.documentElement.style.setProperty('--H',vh+'px');
+  document.documentElement.style.setProperty('--H',(Math.max(vh,innerHeight)+(sa?120:0))+'px');
   scale=Math.min(vw/STAGE_W,vh/STAGE_H);
   const sh=STAGE_H*scale;
   offX=(vw-STAGE_W*scale)/2; offY=(vh-sh)/2;
