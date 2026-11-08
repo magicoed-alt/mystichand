@@ -15,12 +15,13 @@
 <style>
 :root{--u:1vmin}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-html,body{margin:0;height:var(--H,100%);min-height:100%;overflow:hidden;background:#06262c;overscroll-behavior:none;touch-action:none;position:fixed;width:100%}
+html{margin:0;overflow:hidden;background:#06262c;overscroll-behavior:none;touch-action:none;width:100%;min-height:100%}
+body{margin:0;position:relative;width:100%;height:var(--H,100vh);overflow:hidden;touch-action:none;overscroll-behavior:none}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;color:#fff}
 img{-webkit-user-drag:none;pointer-events:none}
 
 /* ---------- CENA DA MÃO ---------- */
-#scene{position:fixed;left:0;top:0;right:0;height:var(--H,100%);min-height:100%;overflow:hidden}
+#scene{position:absolute;left:0;top:0;width:100%;height:var(--H,100vh);overflow:hidden}
 #felt{position:absolute;inset:0;background-color:#0b4750;
   background-image:radial-gradient(ellipse 68% 52% at 50% 44%,#1f9aa3 0%,#157982 34%,#0c505a 66%,#062a31 100%)}
 #stage{position:absolute;left:0;top:0;width:1536px;height:2048px;transform-origin:0 0}
@@ -36,7 +37,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #hot{position:absolute;left:0;top:0;width:96px;height:96px;z-index:5}
 
 /* ---------- LOCKSCREEN ---------- */
-#lock{position:fixed;left:0;top:0;right:0;height:var(--H,100%);min-height:100%;z-index:10;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1);overflow:hidden;background:#0a0d2a}
+#lock{position:absolute;left:0;top:0;width:100%;height:var(--H,100vh);z-index:10;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1);overflow:hidden;background:#0a0d2a}
 #lock.gone{opacity:0;transform:scale(1.18);pointer-events:none}
 #lock.hidden{display:none}
 .wall{position:absolute;inset:-6%;transition:filter .5s ease,transform .5s ease;
@@ -48,7 +49,7 @@ img{-webkit-user-drag:none;pointer-events:none}
    radial-gradient(40vmax 40vmax at 55% 55%,rgba(255,255,255,.10) 0,transparent 70%),
    #0a0d2a}
 #lock.pass .wall{filter:blur(26px) brightness(.62);transform:scale(1.08)}
-.layer{position:absolute;inset:0;transition:opacity .38s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+.layer{position:absolute;left:0;top:0;width:100%;height:var(--V,100%);transition:opacity .38s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
 #lockMain{opacity:1}
 #lock.pass #lockMain{opacity:0;transform:translateY(-6vh);pointer-events:none}
 #passWrap{opacity:0;pointer-events:none;transform:scale(1.04)}
@@ -161,7 +162,7 @@ function layout(){
   const vw=innerWidth;let vh=innerHeight;
   const sa=(navigator.standalone===true)||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;
   if(sa){const L=Math.max(screen.width,screen.height),S=Math.min(screen.width,screen.height);vh=Math.max(vh,innerHeight>innerWidth?L:S);}
-  document.documentElement.style.setProperty('--H',(Math.max(vh,innerHeight)+(sa?120:0))+'px');
+  document.documentElement.style.setProperty('--V',vh+'px');document.documentElement.style.setProperty('--H',(Math.max(vh,innerHeight)+(sa?120:0))+'px');
   scale=Math.min(vw/STAGE_W,vh/STAGE_H);
   const sh=STAGE_H*scale;
   offX=(vw-STAGE_W*scale)/2; offY=(vh-sh)/2;
