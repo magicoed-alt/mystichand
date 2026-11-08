@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mão Elegante</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mão Elegante">
+<meta name="theme-color" content="#06262c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{--u:1vmin}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#06262c;overscroll-behavior:none;touch-action:none;position:fixed;width:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;color:#fff}
+img{-webkit-user-drag:none;pointer-events:none}
+
+/* ---------- CENA DA MÃO ---------- */
+#scene{position:fixed;inset:0;overflow:hidden}
+#felt{position:absolute;inset:0;background-color:#0b4750;
+  background-image:radial-gradient(ellipse 68% 52% at 50% 44%,#1f9aa3 0%,#157982 34%,#0c505a 66%,#062a31 100%)}
+#stage{position:absolute;left:0;top:0;width:1536px;height:2048px;transform-origin:0 0}
+#frame{position:absolute;left:0;top:0;width:1536px;height:2048px}
+#rig{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+#sleeve{position:absolute;left:-246.8px;width:476.5px;top:-4830px;height:4302px;
+  background:url(assets/sleeve.png) repeat-y;background-size:100% 6px;
+  box-shadow:24px 34px 37px rgba(0,0,0,.5);clip-path:inset(-200px -300px 0 -300px)}
+#hand{position:absolute;left:-303.6px;top:-528px;width:805.2px;height:1597.2px}
+#card{position:absolute;left:-368px;top:530px;width:700px;height:980px;border-radius:38px;display:none;overflow:hidden;background:#fff;
+  box-shadow:16px 24px 38px rgba(0,0,0,.55),2px 3px 6px rgba(0,0,0,.4)}
+#card img{display:block;width:700px;height:980px}
+#hot{position:absolute;left:0;top:0;width:96px;height:96px;z-index:5}
+
+/* ---------- LOCKSCREEN ---------- */
+#lock{position:fixed;inset:0;z-index:10;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1);overflow:hidden;background:#0a0d2a}
+#lock.gone{opacity:0;transform:scale(1.18);pointer-events:none}
+#lock.hidden{display:none}
+.wall{position:absolute;inset:-6%;transition:filter .5s ease,transform .5s ease;
+  background:
+   radial-gradient(62vmax 62vmax at 18% 12%,#4a78ff 0,transparent 62%),
+   radial-gradient(56vmax 56vmax at 88% 26%,#b24dff 0,transparent 64%),
+   radial-gradient(72vmax 72vmax at 26% 96%,#ff6b9d 0,transparent 62%),
+   radial-gradient(54vmax 54vmax at 92% 94%,#22d1ff 0,transparent 62%),
+   radial-gradient(40vmax 40vmax at 55% 55%,rgba(255,255,255,.10) 0,transparent 70%),
+   #0a0d2a}
+#lock.pass .wall{filter:blur(26px) brightness(.62);transform:scale(1.08)}
+.layer{position:absolute;inset:0;transition:opacity .38s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+#lockMain{opacity:1}
+#lock.pass #lockMain{opacity:0;transform:translateY(-6vh);pointer-events:none}
+#passWrap{opacity:0;pointer-events:none;transform:scale(1.04)}
+#lock.pass #passWrap{opacity:1;pointer-events:auto;transform:none}
+
+.sb{position:absolute;top:calc(1.5*var(--u));left:0;right:0;height:5vmin;padding:0 3.2vmin;display:flex;align-items:center;justify-content:flex-end;gap:1.3vmin;font-size:2.15vmin;font-weight:600;letter-spacing:.01em}
+.sb svg{height:2.3vmin;width:auto;fill:#fff}
+.lockicon{position:absolute;top:5.2vmin;left:50%;transform:translateX(-50%);width:3.1vmin;opacity:.95}
+.date{position:absolute;top:13.5vh;left:0;right:0;text-align:center;font-size:3.1vmin;font-weight:600;letter-spacing:.005em;opacity:.92;text-transform:none}
+.time{position:absolute;top:15.8vh;left:0;right:0;text-align:center;font-size:19vmin;font-weight:700;letter-spacing:-.01em;line-height:1.05;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.78));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.hint{position:absolute;bottom:7.4vmin;left:0;right:0;text-align:center;font-size:2.35vmin;font-weight:500;opacity:.85}
+.homebar{position:absolute;bottom:2.1vmin;left:50%;width:19vmin;height:.62vmin;border-radius:1vmin;background:rgba(255,255,255,.9);transform:translateX(-50%)}
+.chevron{position:absolute;bottom:11.4vmin;left:50%;transform:translateX(-50%);width:3.4vmin;opacity:.7;animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-.9vmin)}}
+
+#passWrap .title{position:absolute;top:13.8vh;left:0;right:0;text-align:center;font-size:3.5vmin;font-weight:500}
+#dots{position:absolute;top:19.4vh;left:50%;transform:translateX(-50%);display:flex;gap:3.1vmin}
+#dots i{display:block;width:2.7vmin;height:2.7vmin;border-radius:50%;border:.28vmin solid #fff;transition:background .08s}
+#dots i.on{background:#fff}
+#dots.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translateX(calc(-50% - .8vmin))}20%,80%{transform:translateX(calc(-50% + 1.6vmin))}30%,50%,70%{transform:translateX(calc(-50% - 3vmin))}40%,60%{transform:translateX(calc(-50% + 3vmin))}}
+#pad{position:absolute;left:50%;top:27.5vh;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,11.4vmin);grid-auto-rows:11.4vmin;gap:2.7vmin 3.3vmin}
+.key{border-radius:50%;background:rgba(255,255,255,.17);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .12s,transform .12s;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.key b{font-size:5.4vmin;font-weight:400;line-height:1}
+.key small{font-size:1.45vmin;font-weight:600;letter-spacing:.22em;margin-top:.3vmin;height:1.6vmin;opacity:.9;padding-left:.22em}
+.key.press{background:rgba(255,255,255,.55);transition:none}
+.key.empty{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
+.pbtn{position:absolute;bottom:6.2vmin;font-size:2.7vmin;font-weight:500;padding:1.6vmin 2vmin}
+#emerg{left:calc(50% - 21vmin)}
+#cancel{right:calc(50% - 21vmin)}
+.pbtn:active{opacity:.5}
+@media (orientation:landscape){
+  .time{font-size:15vmin;top:12vh}
+}
+
+</style>
+</head>
+<body>
+
+<div id="scene">
+  <div id="felt"></div>
+  <div id="stage">
+    <div id="frame"></div>
+    <div id="rig">
+      <div id="card"><img id="cardimg" alt=""></div>
+      <div id="sleeve"></div>
+      <img id="hand" src="assets/hand.png" alt="">
+    </div>
+  </div>
+  <div id="hot"></div>
+</div>
+
+<div id="lock">
+  <div class="wall"></div>
+
+  <div id="lockMain" class="layer">
+    <div class="sb">
+      <span>Wi-Fi</span>
+      <svg viewBox="0 0 17 12"><path d="M8.5 2.3c2.3 0 4.4.9 6 2.4l1.1-1.2C13.7 1.7 11.2.6 8.5.6S3.3 1.7 1.4 3.5l1.1 1.2c1.6-1.5 3.7-2.4 6-2.4zm0 3.4c1.4 0 2.7.5 3.7 1.5l1.1-1.2C11.9 4.7 10.3 4 8.5 4S5.1 4.7 3.7 6l1.1 1.2c1-1 2.3-1.5 3.7-1.5zm0 3.3c.6 0 1.2.2 1.6.7L8.5 11.4 6.9 9.7c.4-.5 1-.7 1.6-.7z"/></svg>
+      <span>100%</span>
+      <svg viewBox="0 0 27 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="19" height="9" rx="2.2"/><path d="M24.2 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill-opacity=".55"/></svg>
+    </div>
+    <svg class="lockicon" viewBox="0 0 24 30" fill="#fff"><path d="M12 0C8 0 5 3 5 7v4H3.5C2.1 11 1 12.100 1 13.500v13C1 28 2.100 29 3.500 29h17c1.400 0 2.500-1 2.500-2.500v-13c0-1.400-1.100-2.500-2.500-2.500H19V7c0-4-3-7-7-7zm0 2.600c2.500 0 4.400 1.900 4.400 4.400v4H7.600V7c0-2.500 1.900-4.400 4.400-4.400z"/></svg>
+    <div class="date" id="date"></div>
+    <div class="time" id="time"></div>
+    <svg class="chevron" viewBox="0 0 36 14" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l14-8 14 8"/></svg>
+    <div class="hint">Deslize para cima para abrir</div>
+    <div class="homebar"></div>
+  </div>
+
+  <div id="passWrap" class="layer">
+    <div class="sb"><span>Wi-Fi</span>
+      <svg viewBox="0 0 17 12"><path d="M8.5 2.3c2.3 0 4.4.9 6 2.4l1.1-1.2C13.7 1.7 11.2.6 8.5.6S3.3 1.7 1.4 3.5l1.1 1.2c1.6-1.5 3.7-2.4 6-2.4zm0 3.4c1.4 0 2.7.5 3.7 1.5l1.1-1.2C11.900 4.700 10.300 4 8.500 4S5.100 4.700 3.700 6l1.100 1.200c1-1 2.300-1.500 3.700-1.500zm0 3.300c.6 0 1.200.2 1.600.7L8.500 11.400 6.900 9.700c.4-.5 1-.7 1.600-.7z"/></svg>
+      <span>100%</span>
+      <svg viewBox="0 0 27 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="19" height="9" rx="2.2"/><path d="M24.2 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill-opacity=".55"/></svg></div>
+    <div class="title">Digite o código</div>
+    <div id="dots"><i></i><i></i><i></i><i></i></div>
+    <div id="pad"></div>
+    <div class="pbtn" id="emerg">Emergência</div>
+    <div class="pbtn" id="cancel">Cancelar</div>
+  </div>
+</div>
+
+<script>
+/* ===== Mão Elegante — lógica do app ===== */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const STAGE_W=1536,STAGE_H=2048,RIG_SCALE=0.9,CX=768;
+const Y_REST=590,Y_HOLD=512;     // posição (y do pulso) com a mão em repouso / segurando a carta
+let scale=1,offX=0,offY=0,outY=3000;
+let state='locked';              // locked | rest | busy | holding
+let chosen=null;                 // {rank,suit}
+let busy=false;
+
+/* ---------- utilidades ---------- */
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const eInCubic=k=>k*k*k, eOutCubic=k=>1-Math.pow(1-k,3), eInOut=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+const eOutBack=(k)=>{const c1=.9,c3=c1+1;return 1+c3*Math.pow(k-1,3)+c1*Math.pow(k-1,2);};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function tween(from,to,dur,ease,fn){
+  return new Promise(res=>{const t0=performance.now();
+    (function f(t){const k=clamp((t-t0)/dur,0,1);fn(from+(to-from)*ease(k));k<1?requestAnimationFrame(f):res();})(t0);});
+}
+
+/* ---------- layout ---------- */
+function layout(){
+  const vw=innerWidth,vh=innerHeight;
+  scale=Math.min(vw/STAGE_W,vh/STAGE_H);
+  const sh=STAGE_H*scale;
+  offX=(vw-STAGE_W*scale)/2; offY=(vh-sh)/2;
+  $('stage').style.transform='translate('+offX+'px,'+offY+'px) scale('+scale+')';
+  const bottomStage=(vh-offY)/scale;
+  outY=bottomStage+520;
+  if(state==='rest')setY(Y_REST); else if(state==='holding')setY(Y_HOLD); else if(state==='locked')setY(Y_REST);
+  $('hot').style.cssText='left:0;top:0;width:96px;height:96px';
+}
+let curY=Y_REST;
+function setY(y){curY=y;$('rig').style.transform='translate3d('+CX+'px,'+y+'px,0) scale('+RIG_SCALE+')';}
+
+/* ---------- decoração do fundo (feltro + moldura + "?") ---------- */
+function paintFelt(){
+  const c=document.createElement('canvas');c.width=c.height=220;const g=c.getContext('2d');
+  const im=g.createImageData(220,220);
+  for(let i=0;i<im.data.length;i+=4){const v=Math.random()<.5?0:255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=Math.random()*26;}
+  g.putImageData(im,0,0);
+  const felt=$('felt');
+  felt.style.backgroundImage='url('+c.toDataURL()+'),'+getComputedStyle(felt).backgroundImage;
+  felt.style.backgroundSize='220px 220px,auto';
+}
+function paintFrame(){
+  const gold='<linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e7a8"/><stop offset=".45" stop-color="#d6a83a"/><stop offset=".75" stop-color="#f3d57e"/><stop offset="1" stop-color="#8f6a1c"/></linearGradient>';
+  let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 2048" width="1536" height="2048"><defs>'+gold+
+    '<radialGradient id="stud" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff3c2"/><stop offset=".5" stop-color="#d8aa3c"/><stop offset="1" stop-color="#7d5a14"/></radialGradient>'+
+    '<filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter></defs>';
+  s+='<rect x="64" y="64" width="1408" height="1920" rx="30" fill="none" stroke="url(#gg)" stroke-width="6" opacity=".95"/>';
+  s+='<rect x="88" y="88" width="1360" height="1872" rx="18" fill="none" stroke="url(#gg)" stroke-width="2.4" opacity=".75"/>';
+  // ornamentos de canto
+  [[88,88,1,1],[1448,88,-1,1],[88,1960,1,-1],[1448,1960,-1,-1]].forEach(c=>{
+    s+='<g transform="translate('+c[0]+','+c[1]+') scale('+c[2]+','+c[3]+')" fill="none" stroke="url(#gg)" stroke-width="3">'+
+       '<path d="M0,64 Q0,0 64,0" /><path d="M0,100 Q0,0 100,0" opacity=".6"/><circle cx="34" cy="34" r="13" fill="url(#stud)" stroke="#6b4b0e" stroke-width="1.5"/></g>';
+  });
+  // losangos no meio das laterais
+  [[88,1024],[1448,1024]].forEach(c=>{s+='<path d="M'+c[0]+','+(c[1]-26)+' l18,26 l-18,26 l-18,-26 Z" fill="url(#gg)" opacity=".85"/>';});
+  // interrogação
+  s+='<text x="772" y="1862" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-weight="700" font-size="400" fill="#000" opacity=".45" filter="url(#sh)">?</text>';
+  s+='<text x="768" y="1856" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-weight="700" font-size="400" fill="url(#gg)">?</text>';
+  s+='</svg>';
+  $('frame').innerHTML=s;
+}
+
+/* ---------- carta ---------- */
+const cardURL=c=>'assets/cards/'+String(c.rank).padStart(2,'0')+c.suit+'.jpg';
+function showCard(on){
+  const c=$('card');
+  if(on&&chosen){$('cardimg').src=cardURL(chosen);c.style.display='block';}
+  else{c.style.display='none';}
+}
+
+/* ---------- animação da mão ---------- */
+async function sendHand(){
+  if(busy||state!=='rest')return; busy=true;state='busy';
+  await tween(Y_REST,Y_REST-26,170,eOutCubic,setY);
+  await tween(Y_REST-26,outY,1050,eInCubic,setY);
+  showCard(true);
+  await wait(520);
+  await tween(outY,Y_HOLD,1450,k=>eOutBack(k),setY);
+  state='holding';busy=false;
+}
+async function returnHand(){
+  if(busy||state!=='holding')return; busy=true;state='busy';
+  await tween(Y_HOLD,Y_HOLD-22,160,eOutCubic,setY);
+  await tween(Y_HOLD-22,outY,1000,eInCubic,setY);
+  showCard(false);
+  await wait(480);
+  await tween(outY,Y_REST,1400,k=>eOutBack(k),setY);
+  state='rest';busy=false;
+}
+function onSceneTap(e){
+  if(state==='locked')return;
+  const x=e.clientX,w=innerWidth;
+  if(x<w*0.18||x>w*0.82)return;          // só reage no "corredor" central
+  if(e.clientX<110&&e.clientY<110)return;
+  if(state==='rest')sendHand(); else if(state==='holding')returnHand();
+}
+
+/* ---------- relógio da lockscreen ---------- */
+function tick(){
+  const d=new Date();
+  $('time').textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  let ds=d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  $('date').textContent=ds;
+}
+
+/* ---------- código ---------- */
+let entered='';
+function dots(){[...$('dots').children].forEach((el,i)=>el.classList.toggle('on',i<entered.length));
+  $('cancel').textContent=entered.length?'Apagar':'Cancelar';}
+function openPass(){ $('lock').classList.add('pass'); }
+function closePass(){ $('lock').classList.remove('pass'); entered='';dots(); }
+function press(d){
+  if(entered.length>=4)return; entered+=d; dots();
+  if(entered.length===4) setTimeout(check,140);
+}
+function check(){
+  const rank=parseInt(entered.slice(0,2),10), suit=parseInt(entered.charAt(2),10);
+  if(rank>=1&&rank<=13&&suit>=1&&suit<=4){ unlock(rank,suit); }
+  else{ // código "errado": balança igual ao iPad e limpa
+    const d=$('dots');d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake');
+    setTimeout(()=>{entered='';dots();d.classList.remove('shake');},520);
+  }
+}
+function unlock(rank,suit){
+  chosen={rank,suit};
+  const pre=new Image();pre.src=cardURL(chosen);   // pré-carrega a carta escolhida
+  showCard(false);setY(Y_REST);state='rest';busy=false;
+  const L=$('lock');L.classList.add('gone');
+  setTimeout(()=>{L.classList.add('hidden');L.classList.remove('gone');L.classList.remove('pass');entered='';dots();},600);
+}
+function relock(){
+  if(state==='locked'||busy)return;
+  state='locked';chosen=null;showCard(false);
+  const L=$('lock');L.classList.remove('pass');L.classList.remove('hidden');L.classList.add('gone');entered='';dots();tick();
+  void L.offsetWidth;L.classList.remove('gone');
+}
+
+/* ---------- gestos ---------- */
+function setupLock(){
+  const main=$('lockMain');let sy=null,sx=null;
+  main.addEventListener('pointerdown',e=>{sy=e.clientY;sx=e.clientX;});
+  main.addEventListener('pointerup',e=>{ if(sy===null)return; openPass(); sy=null;});
+  main.addEventListener('pointercancel',()=>{sy=null;});
+  const pad=$('pad');
+  const keys=[['1',''],['2','ABC'],['3','DEF'],['4','GHI'],['5','JKL'],['6','MNO'],['7','PQRS'],['8','TUV'],['9','WXYZ'],['',''],['0',''],['','']];
+  keys.forEach(k=>{const el=document.createElement('div');el.className='key'+(k[0]===''?' empty':'');
+    if(k[0]!==''){el.innerHTML='<b>'+k[0]+'</b><small>'+k[1]+'</small>';
+      el.addEventListener('pointerdown',ev=>{ev.preventDefault();el.classList.add('press');press(k[0]);});
+      const up=()=>setTimeout(()=>el.classList.remove('press'),110);
+      el.addEventListener('pointerup',up);el.addEventListener('pointerleave',up);el.addEventListener('pointercancel',up);}
+    pad.appendChild(el);});
+  $('cancel').addEventListener('pointerdown',e=>{e.preventDefault();
+    if(entered.length){entered=entered.slice(0,-1);dots();}else closePass();});
+}
+function setupScene(){
+  $('scene').addEventListener('pointerdown',onSceneTap);
+  // canto superior esquerdo: segurar ~1,6 s volta para a lockscreen (para definir outra carta)
+  let timer=null;
+  const hot=$('hot');
+  hot.addEventListener('pointerdown',e=>{e.stopPropagation();timer=setTimeout(relock,1600);});
+  const cancel=()=>{clearTimeout(timer);timer=null;};
+  hot.addEventListener('pointerup',cancel);hot.addEventListener('pointerleave',cancel);hot.addEventListener('pointercancel',cancel);
+}
+
+/* ---------- inicialização ---------- */
+function init(){
+  paintFelt();paintFrame();layout();setY(Y_REST);tick();setInterval(tick,1000);dots();
+  setupLock();setupScene();
+  addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,200));
+  ['gesturestart','gesturechange','dblclick','contextmenu'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+  document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+  if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+  window.__mao={get state(){return state},get chosen(){return chosen},press,sendHand,returnHand,relock};
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+</body>
+</html>

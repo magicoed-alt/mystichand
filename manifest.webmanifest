@@ -1,0 +1,15 @@
+{
+  "name": "Mão Elegante",
+  "short_name": "Mão Elegante",
+  "description": "Mão elegante que puxa a carta escolhida, com lockscreen de configuração.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#06262c",
+  "theme_color": "#06262c",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}
